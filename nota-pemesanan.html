@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nota Pemesanan — SPPG Sumberkolak 2</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232F4A3C'/%3E%3Cpath d='M18 12h28v38l-4.5-3.5-4.5 3.5-4.5-3.5-4.5 3.5-4.5-3.5-4.5 3.5V12z' fill='%23FAFAF8'/%3E%3Cline x1='23' y1='22' x2='41' y2='22' stroke='%232F4A3C' stroke-width='2.4' stroke-linecap='round'/%3E%3Cline x1='23' y1='29' x2='41' y2='29' stroke='%232F4A3C' stroke-width='2.4' stroke-linecap='round'/%3E%3Cline x1='23' y1='36' x2='34' y2='36' stroke='%232F4A3C' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --bg:#FAFAF8;
+    --card:#FFFFFF;
+    --ink:#1A1A18;
+    --muted:#8B897F;
+    --line:#E7E5DD;
+    --line-strong:#D2CFC3;
+    --accent:#2F4A3C;
+    --accent-bg:#EAF0EC;
+    --danger:#B84A3E;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+  h1{font-size:20px;font-weight:800;margin:0 0 4px;letter-spacing:-0.3px;}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 24px;}
+  .grid{display:grid;grid-template-columns:1fr;gap:28px;}
+  @media(min-width:880px){.grid{grid-template-columns:1fr 380px;align-items:start;}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .panel + .panel{margin-top:16px;}
+  .panel h2{font-size:14px;font-weight:700;margin:0 0 14px;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);}
+
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  input[type=text],input[type=date],input[type=number],textarea,select{
+    width:100%;padding:9px 10px;border:1px solid var(--line-strong);border-radius:8px;
+    font-size:14px;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .field{margin-bottom:12px;}
+
+  .item-row{display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.9fr 28px;gap:6px;margin-bottom:8px;align-items:end;}
+  .item-row label{margin-bottom:2px;}
+  .item-row .del{
+    background:#fff;border:1px solid var(--line-strong);border-radius:8px;color:var(--danger);
+    cursor:pointer;height:36px;font-size:16px;line-height:1;
+  }
+  .item-head{display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.9fr 28px;gap:6px;font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+  .add-btn{
+    margin-top:4px;width:100%;padding:9px;border:1px dashed var(--line-strong);border-radius:8px;
+    background:transparent;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .add-btn:hover{background:var(--accent-bg);}
+
+  .actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
+  button.primary{
+    flex:1;min-width:140px;background:var(--accent);color:#fff;border:none;border-radius:9px;
+    padding:12px 14px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  button.secondary{
+    flex:1;min-width:140px;background:#fff;color:var(--ink);border:1px solid var(--line-strong);
+    border-radius:9px;padding:12px 14px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  button:active{transform:scale(0.98);}
+  .toast{font-size:12px;color:var(--accent);margin-top:8px;height:14px;font-weight:600;}
+
+  /* preview */
+  .preview-outer{position:sticky;top:20px;}
+  #card{
+    width:100%;aspect-ratio:3/4;background:#fff;border-radius:20px;border:1px solid var(--line);
+    padding:32px 26px;display:flex;flex-direction:column;
+  }
+  #card .brand{font-weight:800;font-size:26px;line-height:1.08;margin:0;letter-spacing:-0.6px;}
+  #card .tag{font-size:12px;color:var(--muted);margin:6px 0 20px;font-weight:500;}
+  .meta-line{display:flex;justify-content:space-between;font-size:13px;line-height:2;}
+  .meta-line span:first-child{color:var(--muted);font-weight:500;}
+  .meta-line span:last-child{font-weight:700;text-align:right;max-width:60%;}
+  .hr{height:1px;background:var(--line-strong);margin:14px 0;}
+  #itemsPreview{flex:1;display:flex;flex-direction:column;}
+  .pi-row{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);gap:8px;}
+  .pi-row:last-child{border-bottom:none;}
+  .pi-name{font-size:16px;font-weight:700;margin:0;}
+  .pi-sub{font-size:12px;color:var(--muted);margin:3px 0 0;font-weight:500;}
+  .pi-amt{font-size:16px;font-weight:700;white-space:nowrap;}
+  .total-row{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 14px;}
+  .total-label{font-size:14px;color:var(--muted);font-weight:600;}
+  .total-amt{font-size:28px;font-weight:800;letter-spacing:-0.5px;}
+  .note-preview{font-size:12px;color:var(--muted);line-height:1.6;margin:0;font-weight:500;}
+
+  .history-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .history-item:last-child{border-bottom:none;}
+  .history-item button{background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-size:12px;padding:4px 8px;}
+  .history-empty{font-size:13px;color:var(--muted);}
+
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal-box{background:#fff;border-radius:14px;padding:18px;max-width:420px;width:100%;}
+  .modal-box p{font-size:13px;color:var(--muted);margin:0 0 10px;font-weight:500;}
+  .modal-box textarea{width:100%;height:220px;font-size:13px;font-family:inherit;padding:10px;border:1px solid var(--line-strong);border-radius:8px;resize:none;}
+  .modal-box button{margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--line-strong);background:#fff;font-weight:700;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Generator nota pemesanan</h1>
+  <p class="sub">Isi data pesanan, hasilnya bisa didownload jadi gambar atau disalin teksnya untuk WhatsApp.</p>
+
+  <div class="grid">
+    <div>
+      <div class="panel">
+        <h2>Info umum</h2>
+        <div class="field">
+          <label>Nama usaha</label>
+          <input type="text" id="businessName" value="SPPG Sumberkolak 2">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>No. nota</label>
+            <input type="text" id="notaNo" value="">
+          </div>
+          <div class="field">
+            <label>Tanggal nota</label>
+            <input type="date" id="notaDate">
+          </div>
+        </div>
+        <div class="field">
+          <label>Kepada (nama supplier / toko)</label>
+          <input type="text" id="supplierName" placeholder="misal: Toko Sayur Pak Budi">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Tanggal kirim</label>
+            <input type="date" id="deliveryDate">
+          </div>
+          <div class="field">
+            <label>Waktu / catatan kirim</label>
+            <input type="text" id="deliveryTime" placeholder="misal: pagi, sebelum jam 8">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Daftar item</h2>
+        <div class="item-head">
+          <span>Nama item</span><span>Jumlah</span><span>Satuan</span><span>Harga satuan</span><span></span>
+        </div>
+        <div id="itemsForm"></div>
+        <button class="add-btn" onclick="addItem()">+ Tambah item</button>
+      </div>
+
+      <div class="panel">
+        <h2>Catatan tambahan</h2>
+        <textarea id="notes" rows="2" placeholder="misal: tolong dikirim pagi, kalau stok kosong info dulu ya"></textarea>
+        <div class="actions">
+          <button class="primary" onclick="downloadImage()">Download gambar</button>
+          <button class="secondary" onclick="copyWA()">Salin teks WA</button>
+        </div>
+        <div class="actions">
+          <button class="secondary" onclick="saveHistory()">Simpan ke riwayat</button>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Riwayat nota</h2>
+        <div id="historyList"><p class="history-empty">Belum ada nota tersimpan.</p></div>
+      </div>
+    </div>
+
+    <div class="preview-outer">
+      <div id="card">
+        <p class="brand" id="pvBrand">SPPG<br>Sumberkolak 2</p>
+        <p class="tag">nota pemesanan bahan</p>
+        <div class="meta-line"><span>kepada</span><span id="pvSupplier">—</span></div>
+        <div class="meta-line"><span>kirim</span><span id="pvDelivery">—</span></div>
+        <div class="hr"></div>
+        <div id="itemsPreview"></div>
+        <div class="hr"></div>
+        <div class="total-row"><span class="total-label">total</span><span class="total-amt" id="pvTotal">Rp 0</span></div>
+        <p class="note-preview" id="pvNote"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="manualCopyModal">
+  <div class="modal-box">
+    <p>Penyalinan otomatis diblokir browser. Teks sudah ke-select, tekan lama lalu pilih "salin":</p>
+    <textarea id="manualCopyText" readonly></textarea>
+    <button onclick="document.getElementById('manualCopyModal').style.display='none'">Tutup</button>
+  </div>
+</div>
+
+<script>
+const DAYS=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+let items=[{name:'',qty:'',unit:'kg',price:''}];
+let itemSeq=0;
+
+function fmtIDR(n){return 'Rp ' + Math.round(n||0).toLocaleString('id-ID');}
+function fmtNum(n){return Math.round(n||0).toLocaleString('id-ID');}
+
+function fmtDateWithDay(dateStr){
+  if(!dateStr) return '—';
+  const d=new Date(dateStr+'T00:00:00');
+  if(isNaN(d)) return '—';
+  return `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+function fmtDatePlain(dateStr){
+  if(!dateStr) return '—';
+  const d=new Date(dateStr+'T00:00:00');
+  if(isNaN(d)) return '—';
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function initDefaults(){
+  const today=new Date();
+  document.getElementById('notaDate').value=today.toISOString().slice(0,10);
+  document.getElementById('notaNo').value = 'SPPG-' + today.toISOString().slice(0,10).replace(/-/g,'') + '-01';
+  renderItemsForm();
+  updatePreview();
+}
+
+function addItem(){
+  items.push({name:'',qty:'',unit:'kg',price:''});
+  renderItemsForm();
+}
+function removeItem(idx){
+  items.splice(idx,1);
+  if(items.length===0) items.push({name:'',qty:'',unit:'kg',price:''});
+  renderItemsForm();
+  updatePreview();
+}
+
+function renderItemsForm(){
+  const wrap=document.getElementById('itemsForm');
+  wrap.innerHTML='';
+  items.forEach((it,idx)=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    row.innerHTML=`
+      <input type="text" placeholder="nama item" value="${it.name}" oninput="items[${idx}].name=this.value;updatePreview()">
+      <input type="number" placeholder="0" value="${it.qty}" oninput="items[${idx}].qty=this.value;updatePreview()">
+      <input type="text" placeholder="kg" value="${it.unit}" oninput="items[${idx}].unit=this.value;updatePreview()">
+      <input type="number" placeholder="0" value="${it.price}" oninput="items[${idx}].price=this.value;updatePreview()">
+      <button class="del" onclick="removeItem(${idx})" aria-label="hapus item">×</button>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function updatePreview(){
+  document.getElementById('pvBrand').innerHTML = (document.getElementById('businessName').value||'Usaha').replace(/ /g,'<br>').split('<br>').slice(0,2).join('<br>');
+  // keep brand on max 2 lines but use spaces normally; simpler: just show as-is with wrap
+  document.getElementById('pvBrand').innerText = document.getElementById('businessName').value || 'Usaha';
+
+  document.getElementById('pvSupplier').innerText = document.getElementById('supplierName').value || '—';
+  const dTxt = fmtDateWithDay(document.getElementById('deliveryDate').value);
+  const dTime = document.getElementById('deliveryTime').value;
+  document.getElementById('pvDelivery').innerText = dTime ? `${dTxt}, ${dTime}` : dTxt;
+
+  const wrap=document.getElementById('itemsPreview');
+  wrap.innerHTML='';
+  let total=0;
+  items.forEach(it=>{
+    if(!it.name && !it.qty && !it.price) return;
+    const qty=parseFloat(it.qty)||0;
+    const price=parseFloat(it.price)||0;
+    const sub=qty*price;
+    total+=sub;
+    const row=document.createElement('div');
+    row.className='pi-row';
+    row.innerHTML=`
+      <div>
+        <p class="pi-name">${it.name||'(nama item)'}</p>
+        <p class="pi-sub">${fmtNum(qty)} ${it.unit||''} &times; ${fmtNum(price)}</p>
+      </div>
+      <p class="pi-amt">${fmtNum(sub)}</p>
+    `;
+    wrap.appendChild(row);
+  });
+  if(wrap.innerHTML==='') wrap.innerHTML='<p class="history-empty">Belum ada item</p>';
+
+  document.getElementById('pvTotal').innerText = fmtIDR(total);
+  document.getElementById('pvNote').innerText = document.getElementById('notes').value || '';
+}
+
+['businessName','supplierName','deliveryDate','deliveryTime','notes','notaNo','notaDate'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updatePreview);
+});
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerText=msg;
+  setTimeout(()=>{t.innerText='';},2500);
+}
+
+function downloadImage(){
+  const card=document.getElementById('card');
+  html2canvas(card,{scale:3,backgroundColor:'#ffffff'}).then(canvas=>{
+    const link=document.createElement('a');
+    const notaNo=document.getElementById('notaNo').value||'nota';
+    link.download = notaNo + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Gambar berhasil didownload');
+  });
+}
+
+function buildWAText(){
+  const business=document.getElementById('businessName').value||'Usaha';
+  const notaNo=document.getElementById('notaNo').value||'-';
+  const notaDate=fmtDatePlain(document.getElementById('notaDate').value);
+  const supplier=document.getElementById('supplierName').value||'-';
+  const dTxt=fmtDateWithDay(document.getElementById('deliveryDate').value);
+  const dTime=document.getElementById('deliveryTime').value;
+  const notes=document.getElementById('notes').value;
+
+  let lines=[];
+  lines.push(`NOTA PEMESANAN — ${business}`);
+  lines.push(`No: ${notaNo} | ${notaDate}`);
+  lines.push('');
+  lines.push(`Kepada: ${supplier}`);
+  lines.push(`Kirim: ${dTxt}${dTime ? ', '+dTime : ''}`);
+  lines.push('');
+
+  let total=0;
+  let n=1;
+  items.forEach(it=>{
+    if(!it.name && !it.qty && !it.price) return;
+    const qty=parseFloat(it.qty)||0;
+    const price=parseFloat(it.price)||0;
+    const sub=qty*price;
+    total+=sub;
+    lines.push(`${n}. ${it.name||'(nama item)'} – ${fmtNum(qty)} ${it.unit||''} @${fmtNum(price)} = ${fmtNum(sub)}`);
+    n++;
+  });
+
+  lines.push('');
+  lines.push(`Total: ${fmtIDR(total)}`);
+  if(notes){
+    lines.push('');
+    lines.push(`Catatan: ${notes}`);
+  }
+  lines.push('');
+  lines.push('Terima kasih');
+  return lines.join('\n');
+}
+
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.position='fixed';
+  ta.style.top='-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  let ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){ ok=false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+function showManualCopyBox(text){
+  const modal=document.getElementById('manualCopyModal');
+  const ta=document.getElementById('manualCopyText');
+  ta.value=text;
+  modal.style.display='flex';
+  ta.focus();
+  ta.select();
+}
+
+async function copyWA(){
+  const text=buildWAText();
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      showToast('Teks WA berhasil disalin');
+      return;
+    }
+    throw new Error('clipboard API tidak tersedia');
+  }catch(e){
+    if(fallbackCopy(text)){
+      showToast('Teks WA berhasil disalin');
+    }else{
+      showManualCopyBox(text);
+      showToast('Tekan lama lalu pilih "salin" di kotak teks');
+    }
+  }
+}
+
+function currentNotaData(){
+  return {
+    id: Date.now().toString(),
+    businessName: document.getElementById('businessName').value,
+    notaNo: document.getElementById('notaNo').value,
+    notaDate: document.getElementById('notaDate').value,
+    supplierName: document.getElementById('supplierName').value,
+    deliveryDate: document.getElementById('deliveryDate').value,
+    deliveryTime: document.getElementById('deliveryTime').value,
+    notes: document.getElementById('notes').value,
+    items: JSON.parse(JSON.stringify(items))
+  };
+}
+
+async function saveHistory(){
+  try{
+    const data=currentNotaData();
+    await window.storage.set('nota:'+data.id, JSON.stringify(data), false);
+    showToast('Nota disimpan ke riwayat');
+    loadHistory();
+  }catch(e){
+    showToast('Gagal menyimpan riwayat');
+  }
+}
+
+async function loadHistory(){
+  const listEl=document.getElementById('historyList');
+  try{
+    const res=await window.storage.list('nota:', false);
+    if(!res || !res.keys || res.keys.length===0){
+      listEl.innerHTML='<p class="history-empty">Belum ada nota tersimpan.</p>';
+      return;
+    }
+    const entries=[];
+    for(const key of res.keys){
+      try{
+        const item=await window.storage.get(key, false);
+        if(item) entries.push(JSON.parse(item.value));
+      }catch(e){}
+    }
+    entries.sort((a,b)=>b.id-a.id);
+    listEl.innerHTML='';
+    entries.forEach(data=>{
+      const row=document.createElement('div');
+      row.className='history-item';
+      const label = `${data.notaNo||'-'} — ${data.supplierName||'-'}`;
+      row.innerHTML=`<span>${label}</span><span><button onclick='loadNota(${JSON.stringify(JSON.stringify(data))})'>muat</button><button onclick="deleteHistory('${data.id}')" style="color:var(--danger)">hapus</button></span>`;
+      listEl.appendChild(row);
+    });
+  }catch(e){
+    listEl.innerHTML='<p class="history-empty">Belum ada nota tersimpan.</p>';
+  }
+}
+
+function loadNota(jsonStr){
+  const data=JSON.parse(jsonStr);
+  document.getElementById('businessName').value=data.businessName||'';
+  document.getElementById('notaNo').value=data.notaNo||'';
+  document.getElementById('notaDate').value=data.notaDate||'';
+  document.getElementById('supplierName').value=data.supplierName||'';
+  document.getElementById('deliveryDate').value=data.deliveryDate||'';
+  document.getElementById('deliveryTime').value=data.deliveryTime||'';
+  document.getElementById('notes').value=data.notes||'';
+  items = data.items && data.items.length ? data.items : [{name:'',qty:'',unit:'kg',price:''}];
+  renderItemsForm();
+  updatePreview();
+  showToast('Nota dimuat dari riwayat');
+}
+
+async function deleteHistory(id){
+  try{
+    await window.storage.delete('nota:'+id, false);
+    loadHistory();
+    showToast('Nota dihapus dari riwayat');
+  }catch(e){
+    showToast('Gagal menghapus');
+  }
+}
+
+initDefaults();
+loadHistory();
+</script>
+</body>
+</html>
